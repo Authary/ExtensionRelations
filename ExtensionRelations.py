@@ -1,5 +1,6 @@
 import PCA
 from itertools import chain, combinations
+import copy
 
 def powerset(iterable):
     s = list(iterable)
@@ -54,7 +55,7 @@ def intersectExtensions(ens1,ens2):
     for E in intersections:
         add = True
         for E2 in intersections:
-            if set(E).issubset(set(E2)) and not set(E).issubset(set(E2)):
+            if set(E).issubset(set(E2)) and not set(E2).issubset(set(E)):
                 add = False
         if add and E not in Result:
             Result.append(E)
@@ -74,31 +75,28 @@ def observation(relation,ens):
     for dim in relation[1]:
         GroundSet += dim
 
-    print("GroundSet",GroundSet)
-    print("Dimensions observatrices",dimensionsObservatrices)
+    Rel = copy.copy(relation[0])
     
     for dim in dimensionsObservatrices:
         newGroundSet = list(set(GroundSet).difference(set(relation[1][dim])))
-        print("newGroundSet",newGroundSet)
         Observateurs = list(set(relation[1][dim]).intersection(set(ens)))
-        print("Observateurs",Observateurs)
         PS = powerset(newGroundSet)
         newRelation = {}
         for B in list(PS):
-            print("coucou2")
             Conclusions = [newGroundSet]
-            print("Boite",B)
             for obs in range(len(Observateurs)):
                 box = list(B)+[Observateurs[obs]]
                 box.sort()
                 box = tuple(box)
-                Conclusions = intersectExtensions(Conclusions,relation[0][box])
+                Conclusions = intersectExtensions(Conclusions,Rel[box])
             newRelation[tuple(B)] = Conclusions
+        GroundSet = newGroundSet
+        Rel = newRelation
 
-    D = []
-    for dim in range(len(relation[1])):
-        if dim not in dimensionsObservatrices:
-            D.append(relation[1][dim])
+        D = []
+        for dim in range(len(relation[1])):
+            if dim not in dimensionsObservatrices:
+                D.append(relation[1][dim])
 
     return(newRelation,D)
 
