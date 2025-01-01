@@ -58,6 +58,7 @@ def intersectExtensions(ens1,ens2):
             if set(E).issubset(set(E2)) and not set(E2).issubset(set(E)):
                 add = False
         if add and E not in Result:
+            E.sort()
             Result.append(E)
     return Result
 
